@@ -288,6 +288,10 @@ int rkcommon_check_params(struct image_tool_params *params)
 		return EXIT_FAILURE;
 	}
 
+	if (!strcmp(params->imagename, "rk3506")) {
+		spl_params.images[1].address = 0x00080000;
+	}
+
 	return EXIT_SUCCESS;
 
 err_spl_info:
