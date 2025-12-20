@@ -1,0 +1,165 @@
+/*
+ * (C) Copyright 2024 Rockchip Electronics Co., Ltd
+ *
+ * SPDX-License-Identifier:     GPL-2.0+
+ */
+
+/ {
+	aliases {
+		mmc0 = &mmc;
+	};
+
+	dmc {
+		compatible = "rockchip,rk3506-dmc";
+		bootph-all;
+	};
+
+	chosen: chosen {
+		stdout-path = &uart0;
+		u-boot,spl-boot-order = "same-as-spl", &mmc, &spi_nand, &spi_nor;
+	};
+};
+
+#if defined(CONFIG_SPL) && defined(HAS_FIT)
+&fit_template {
+	images {
+		op-tee {
+			load = <0x3c00000>;
+			entry = <0x3c00000>;
+		};
+	};
+};
+#endif
+
+&mmc {
+	bus-width = <4>;
+	bootph-pre-ram;
+	status = "okay";
+};
+
+&cru {
+	bootph-all;
+	status = "okay";
+};
+
+&grf {
+	bootph-pre-ram;
+	status = "okay";
+};
+
+&ioc_grf {
+	bootph-pre-ram;
+	status = "okay";
+};
+
+&pinctrl {
+	bootph-pre-ram;
+	status = "okay";
+};
+
+&ioc1 {
+	bootph-pre-ram;
+	status = "okay";
+};
+
+&grf_pmu {
+	bootph-pre-ram;
+	status = "okay";
+};
+
+&ioc_pmu {
+	bootph-pre-ram;
+	status = "okay";
+};
+
+&gpio0 {
+	bootph-pre-ram;
+	status = "okay";
+};
+
+&gpio1 {
+	bootph-all;
+	status = "okay";
+};
+
+&gpio2 {
+	bootph-all;
+	status = "okay";
+};
+
+&gpio3 {
+	bootph-pre-ram;
+	status = "okay";
+};
+
+&gpio4 {
+	bootph-all;
+	status = "okay";
+};
+
+&psci {
+	bootph-all;
+	status = "okay";
+};
+
+&crypto {
+	bootph-pre-ram;
+	status = "okay";
+};
+
+&rng {
+	bootph-pre-ram;
+	status = "okay";
+};
+
+&saradc {
+	bootph-pre-ram;
+	status = "okay";
+};
+
+&fspi {
+	bootph-pre-ram;
+	status = "okay";
+
+	#address-cells = <1>;
+	#size-cells = <0>;
+	spi_nand: flash@0 {
+		bootph-pre-ram;
+		compatible = "spi-nand";
+		reg = <0>;
+		spi-tx-bus-width = <1>;
+		spi-rx-bus-width = <4>;
+		spi-max-frequency = <80000000>;
+	};
+
+	spi_nor: flash@1 {
+		bootph-pre-ram;
+		compatible = "jedec,spi-nor";
+		label = "sfc_nor";
+		reg = <0>;
+		spi-tx-bus-width = <1>;
+		spi-rx-bus-width = <4>;
+		spi-max-frequency = <80000000>;
+	};
+};
+
+&usb2phy {
+	bootph-all;
+	status = "okay";
+};
+
+&u2phy_otg0 {
+	bootph-all;
+	status = "okay";
+};
+
+&usb20_otg0 {
+	bootph-all;
+	status = "okay";
+};
+
+&uart0 {
+	bootph-all;
+	clock-frequency = <24000000>;
+	status = "okay";
+};
