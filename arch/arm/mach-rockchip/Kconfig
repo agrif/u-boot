@@ -348,6 +348,7 @@ config ROCKCHIP_RK3528
 	imply ROCKCHIP_COMMON_BOARD
 	imply ROCKCHIP_COMMON_STACK_ADDR
 	imply ROCKCHIP_EXTERNAL_TPL
+	imply ROCKCHIP_EXTERNAL_TPL_DDR_MEM
 	imply ROCKCHIP_OTP
 	imply SPL_ATF
 	imply SPL_ATF_NO_PLATFORM_PARAM if SPL_ATF
@@ -392,6 +393,7 @@ config ROCKCHIP_RK3568
 	imply ROCKCHIP_COMMON_BOARD
 	imply ROCKCHIP_COMMON_STACK_ADDR
 	imply ROCKCHIP_EXTERNAL_TPL
+	imply ROCKCHIP_EXTERNAL_TPL_DDR_MEM
 	imply ROCKCHIP_OTP
 	imply SPL_ATF_NO_PLATFORM_PARAM if SPL_ATF
 	imply SPL_MMC_HS200_SUPPORT if SPL_MMC && MMC_HS200_SUPPORT
@@ -432,6 +434,7 @@ config ROCKCHIP_RK3576
 	imply ROCKCHIP_COMMON_BOARD
 	imply ROCKCHIP_COMMON_STACK_ADDR
 	imply ROCKCHIP_EXTERNAL_TPL
+	imply ROCKCHIP_EXTERNAL_TPL_DDR_MEM
 	imply ROCKCHIP_OTP
 	imply SPL_ATF
 	imply SPL_ATF_NO_PLATFORM_PARAM if SPL_ATF
@@ -477,6 +480,7 @@ config ROCKCHIP_RK3588
 	imply ROCKCHIP_COMMON_BOARD
 	imply ROCKCHIP_COMMON_STACK_ADDR
 	imply ROCKCHIP_EXTERNAL_TPL
+	imply ROCKCHIP_EXTERNAL_TPL_DDR_MEM
 	imply ROCKCHIP_OTP
 	imply SCMI_FIRMWARE
 	imply SPL_ATF_NO_PLATFORM_PARAM if SPL_ATF
@@ -607,6 +611,13 @@ config ROCKCHIP_EXTERNAL_TPL
 	  Some Rockchip SoCs require an external TPL to initialize DRAM.
 	  Enable this option and build with ROCKCHIP_TPL=/path/to/ddr.bin to
 	  include the external TPL in the image built by binman.
+
+config ROCKCHIP_EXTERNAL_TPL_DDR_MEM
+	bool "Use DDR_MEM information from external TPL"
+	depends on ROCKCHIP_EXTERNAL_TPL
+	help
+	  Some Rockchip external TPLs provide information about DDR memory.
+	  Enable this option to parse and use this information.
 
 config ROCKCHIP_BOOT_MODE_REG
 	hex "Rockchip boot mode flag register address"

@@ -36,10 +36,14 @@ struct tos_parameter_t {
 	s64 reserve[8];
 };
 
-#ifdef CONFIG_ARM64
+#ifdef CONFIG_ROCKCHIP_EXTERNAL_TPL_DDR_MEM
 /* Tag size and offset */
+#ifndef ATAGS_SIZE
 #define ATAGS_SIZE		SZ_8K
+#endif
+#ifndef ATAGS_OFFSET
 #define ATAGS_OFFSET		(SZ_2M - ATAGS_SIZE)
+#endif
 #define ATAGS_PHYS_BASE		(CFG_SYS_SDRAM_BASE + ATAGS_OFFSET)
 #define ATAGS_PHYS_END		(ATAGS_PHYS_BASE + ATAGS_SIZE)
 
@@ -109,15 +113,6 @@ static int rockchip_dram_init_banksize(void)
 	u32 calc_hash;
 	u8 i, j;
 
-	if (!IS_ENABLED(CONFIG_ROCKCHIP_RK3588) &&
-	    !IS_ENABLED(CONFIG_ROCKCHIP_RK3576) &&
-	    !IS_ENABLED(CONFIG_ROCKCHIP_RK3568) &&
-	    !IS_ENABLED(CONFIG_ROCKCHIP_RK3528))
-		return -ENOTSUPP;
-
-	if (!IS_ENABLED(CONFIG_ROCKCHIP_EXTERNAL_TPL))
-		return -ENOTSUPP;
-
 	/* Find DDR_MEM tag */
 	while (addr < (u32 *)ATAGS_PHYS_END) {
 		tag_h = (const struct tag_header *)addr;
@@ -176,6 +171,7 @@ static int rockchip_dram_init_banksize(void)
 	for (i = 0, j = 0; i < ddr_info->count; i++, j++) {
 		phys_size_t size = ddr_info->bank[(i + ddr_info->count)];
 		phys_addr_t start_addr = ddr_info->bank[i];
+#ifdef CONFIG_ARM64
 		struct mm_region *tmp_mem_map = mem_map;
 		phys_addr_t end_addr;
 
@@ -274,6 +270,7 @@ static int rockchip_dram_init_banksize(void)
 
 			tmp_mem_map++;
 		}
+#endif /* CONFIG_ARM64 */
 
 		if (j > CONFIG_NR_DRAM_BANKS) {
 			debug("Too many banks, max allowed (%d)\n",
@@ -287,14 +284,14 @@ static int rockchip_dram_init_banksize(void)
 
 	return 0;
 }
-#endif
+#endif /* CONFIG_ROCKCHIP_EXTERNAL_TPL_DDR_MEM */
 
 int dram_init_banksize(void)
 {
 	size_t ram_top = (unsigned long)(gd->ram_size + CFG_SYS_SDRAM_BASE);
 	size_t top = min((unsigned long)ram_top, (unsigned long)(gd->ram_top));
 
-#ifdef CONFIG_ARM64
+#ifdef CONFIG_ROCKCHIP_EXTERNAL_TPL_DDR_MEM
 	int ret = rockchip_dram_init_banksize();
 
 	if (!ret)
@@ -302,7 +299,9 @@ int dram_init_banksize(void)
 
 	debug("Couldn't use ATAG (%d) to detect DDR layout, falling back...\n",
 	      ret);
+#endif
 
+#ifdef CONFIG_ARM64
 	/* Reserve 2M for ATF bl31 */
 	gd->bd->bi_dram[0].start = CFG_SYS_SDRAM_BASE + SZ_2M;
 	gd->bd->bi_dram[0].size = top - gd->bd->bi_dram[0].start;
@@ -314,7 +313,7 @@ int dram_init_banksize(void)
 	} else if (ram_top > SZ_4G && top == SZ_4G) {
 		gd->bd->bi_dram[0].size = ram_top - gd->bd->bi_dram[0].start;
 	}
-#else
+#else /* !CONFIG_ARM64 */
 #ifdef CONFIG_SPL_OPTEE_IMAGE
 	struct tos_parameter_t *tos_parameter;
 
@@ -340,7 +339,7 @@ int dram_init_banksize(void)
 	gd->bd->bi_dram[0].start = CFG_SYS_SDRAM_BASE;
 	gd->bd->bi_dram[0].size = top - gd->bd->bi_dram[0].start;
 #endif
-#endif
+#endif /* CONFIG_ARM64 */
 
 	return 0;
 }
